@@ -17,3 +17,6 @@ dotnet ef dbcontext scaffold -c Adventureworks -o model "Data Source=127.0.0.1;I
 
 dotnet ef dbcontext scaffold -c AdventureworksLogic -o logic "Data Source=127.0.0.1;Initial Catalog=AdventureWorks.Logic;persist security info=True;user id=sa;password=abc123$%" Microsoft.EntityFrameworkCore.SqlServer --force
 ```
+
+https://docs.microsoft.com/en-us/aspnet/core/mvc/razor-pages/?tabs=visual-studio
+https://msdn.microsoft.com/en-us/magazine/mt842512.aspx

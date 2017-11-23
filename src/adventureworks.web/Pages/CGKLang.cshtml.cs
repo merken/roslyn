@@ -15,5 +15,17 @@ namespace adventureworks.web.Pages
         {
             Message = "Your contact page.";
         }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            _db.Customers.Add(Customer);
+            await _db.SaveChangesAsync();
+            return RedirectToPage("/Index");
+        }
     }
 }
