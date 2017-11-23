@@ -13,5 +13,5 @@ Connect SSMS to localhost with SA and restore backup.
 
 Scaffold the ef model.
 ```
-dotnet ef dbcontext scaffold -c LegacyContext -o Model "Data Source=127.0.0.1;Initial Catalog=AdventureWorks2016;persist security info=True;user id=sa;password=abc123$%" Microsoft.EntityFrameworkCore.SqlServer --force
+dotnet ef dbcontext scaffold -c Adventureworks "Data Source=127.0.0.1;Initial Catalog=AdventureWorks2016;persist security info=True;user id=sa;password=abc123$%" Microsoft.EntityFrameworkCore.SqlServer --force
 ```
