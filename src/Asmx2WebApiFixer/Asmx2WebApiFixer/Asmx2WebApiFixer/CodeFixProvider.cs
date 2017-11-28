@@ -12,13 +12,15 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis.CSharp.Extensions;
+
 
 namespace Asmx2WebApiFixer
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Asmx2WebApiFixerCodeFixProvider)), Shared]
     public class Asmx2WebApiFixerCodeFixProvider : CodeFixProvider
     {
-        private const string title = "Make uppercase";
+        private const string title = "Generate WebApi Controller";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
@@ -61,8 +63,10 @@ namespace Asmx2WebApiFixer
             var classUsings = GetUsingsFromClass(classDeclaration);
             var classNamespace = GetNamespaceFromClass(classDeclaration);
             var webmethods = GetWebMethodsFrom(classDeclaration);
+            var constructors = GetConstructorsFrom(classDeclaration);
+            var othermembers = GetMembersFrom(classDeclaration).Except(webmethods).Except(constructors);
 
-            var webApiController = GenerateWebApiFrom(webmethods, othermethods);
+            //var webApiController = GenerateWebApiFrom(webmethods, othermethods);
 
             //TODO get name of webservice
             //TODO create api controller
@@ -70,27 +74,26 @@ namespace Asmx2WebApiFixer
             //TODO remove attributes
             //TODO add routes based on webmethod names
 
+            var newFileTree = SyntaxFactory.CompilationUnit()
+                .WithUsings(SyntaxFactory.List<UsingDirectiveSyntax>(classUsings.Select(i => (UsingDirectiveSyntax)i)))
+                .WithMembers(
+                            SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
+                                SyntaxFactory.NamespaceDeclaration(
+                                    SyntaxFactory.IdentifierName(classNamespace.Name.ToString()))
+                                    .AddMembers(SyntaxFactory.ClassDeclaration($"{webserviceName}")
+                                        .AddMembers(constructors.Select(c =>
+                                            c.WithIdentifier(SyntaxFactory.Identifier($"{webserviceName}"))).ToArray())
+                                        .AddMembers(othermembers.ToArray()))))
+                .WithoutLeadingTrivia()
+                .NormalizeWhitespace();
 
-            // Compute new uppercase name.
-            var identifierToken = typeDecl.Identifier;
-            var newName = identifierToken.Text.ToUpperInvariant();
-
-            // Get the symbol representing the type to be renamed.
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl, cancellationToken);
-
-            // Produce a new solution that has all references to that type renamed, including the declaration.
-            var originalSolution = document.Project.Solution;
-            var optionSet = originalSolution.Workspace.Options;
-            var newSolution = await Renamer.RenameSymbolAsync(document.Project.Solution, typeSymbol, newName, optionSet, cancellationToken).ConfigureAwait(false);
-
-            // Return the new solution with the now-uppercase type name.
-            return newSolution;
+            var newDocument = document.Project.AddDocument($"{webserviceName}.cs", SourceText.From(newFileTree.ToFullString()), document.Folders);
+            return newDocument.Project.Solution;
         }
 
         private IList<UsingDirectiveSyntax> GetUsingsFromClass(ClassDeclarationSyntax @class)
         {
-            return (@class.Parent as NamespaceDeclarationSyntax).Usings.ToList();
+            return ((Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)((Microsoft.CodeAnalysis.SyntaxNode)(@class.Parent)).Parent).Usings.ToList();
         }
 
         private NamespaceDeclarationSyntax GetNamespaceFromClass(ClassDeclarationSyntax @class)
@@ -104,8 +107,15 @@ namespace Asmx2WebApiFixer
             return methodDeclarations.Where(m => m.AttributeLists.ContainsAttributeInList("WebMethod")).ToList();
         }
 
-        private bool ContainsAttribute(SyntaxList<AttributeListSyntax> attributeLists, string attribute)
+        private IList<ConstructorDeclarationSyntax> GetConstructorsFrom(ClassDeclarationSyntax webservice)
         {
+            var constructors = webservice.Members.Where(m => m is ConstructorDeclarationSyntax).Cast<ConstructorDeclarationSyntax>();
+            return constructors.ToList();
+        }
+
+        private IList<MemberDeclarationSyntax> GetMembersFrom(ClassDeclarationSyntax webservice)
+        {
+            return webservice.Members.ToList();
         }
 
         private bool IsHttpPost(ClassDeclarationSyntax classDeclaration, MethodDeclarationSyntax method)
