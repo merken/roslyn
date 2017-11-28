@@ -20,7 +20,7 @@ namespace Asmx2WebApiFixer
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-        private const string Category = "Naming";
+        private const string Category = "Refactoring";
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
@@ -36,9 +36,8 @@ namespace Asmx2WebApiFixer
             var classDeclaration = (context.Node as ClassDeclarationSyntax);
 
             if (classDeclaration != null && classDeclaration.AttributeLists.Any() &&
-                classDeclaration.AttributeLists.SelectMany(a => a.Attributes).Select(at => at.Name.ToFullString()).Any(fs=>fs == "System.Web.Script.Services.ScriptService") ||
-                classDeclaration.AttributeLists.SelectMany(a => a.Attributes).Select(at => at.Name.ToFullString()).Any(fs => fs == "WebService"))
-
+                classDeclaration.AttributeLists.ContainsAttributeInList("System.Web.Script.Services.ScriptService") ||
+                classDeclaration.AttributeLists.ContainsAttributeInList("WebService"))
             {
                 //This is a script service
                 context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));

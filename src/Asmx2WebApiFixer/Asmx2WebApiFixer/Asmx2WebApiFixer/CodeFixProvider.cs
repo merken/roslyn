@@ -40,19 +40,29 @@ namespace Asmx2WebApiFixer
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
             // Find the type declaration identified by the diagnostic.
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
+            var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().First();
 
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: title,
-                    createChangedSolution: c => MakeUppercaseAsync(context.Document, declaration, c),
+                    createChangedSolution: c => CreateWebApi(context.Document, declaration, c),
                     equivalenceKey: title),
                 diagnostic);
         }
 
-        private async Task<Solution> MakeUppercaseAsync(Document document, TypeDeclarationSyntax typeDecl, CancellationToken cancellationToken)
+        private async Task<Solution> CreateWebApi(Document document, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
+            var webserviceName = classDeclaration.Identifier.Text;
+            webserviceName = webserviceName.Replace("Service", String.Empty);
+            webserviceName = webserviceName.Replace("service", String.Empty);
+            webserviceName = $"{webserviceName}Controller";
+
+            var classUsings = GetUsingsFromClass(classDeclaration);
+            var classNamespace = GetNamespaceFromClass(classDeclaration);
+            var webmethods = GetWebMethodsFrom(classDeclaration);
+
+            var webApiController = GenerateWebApiFrom(webmethods, othermethods);
 
             //TODO get name of webservice
             //TODO create api controller
@@ -76,6 +86,36 @@ namespace Asmx2WebApiFixer
 
             // Return the new solution with the now-uppercase type name.
             return newSolution;
+        }
+
+        private IList<UsingDirectiveSyntax> GetUsingsFromClass(ClassDeclarationSyntax @class)
+        {
+            return (@class.Parent as NamespaceDeclarationSyntax).Usings.ToList();
+        }
+
+        private NamespaceDeclarationSyntax GetNamespaceFromClass(ClassDeclarationSyntax @class)
+        {
+            return (@class.Parent as NamespaceDeclarationSyntax);
+        }
+
+        private IList<MethodDeclarationSyntax> GetWebMethodsFrom(ClassDeclarationSyntax webservice)
+        {
+            var methodDeclarations = webservice.Members.Where(m => m is MethodDeclarationSyntax).Cast<MethodDeclarationSyntax>();
+            return methodDeclarations.Where(m => m.AttributeLists.ContainsAttributeInList("WebMethod")).ToList();
+        }
+
+        private bool ContainsAttribute(SyntaxList<AttributeListSyntax> attributeLists, string attribute)
+        {
+        }
+
+        private bool IsHttpPost(ClassDeclarationSyntax classDeclaration, MethodDeclarationSyntax method)
+        {
+            var isPostConfigured = classDeclaration.AttributeLists.ContainsAttributeInList("ScriptService");
+
+            if (!isPostConfigured)
+                isPostConfigured = method.AttributeLists.ContainsAttributeInList("ScriptMethod");
+
+            return isPostConfigured;
         }
     }
 }
