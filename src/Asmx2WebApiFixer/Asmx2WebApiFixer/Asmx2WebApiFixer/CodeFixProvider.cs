@@ -21,6 +21,7 @@ namespace Asmx2WebApiFixer
     public class Asmx2WebApiFixerCodeFixProvider : CodeFixProvider
     {
         private const string title = "Generate WebApi Controller";
+        private string[] webApiUsings = new String[] { "System.Net.Http","System.Web.Http" };
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
@@ -61,10 +62,12 @@ namespace Asmx2WebApiFixer
             webserviceName = $"{webserviceName}Controller";
 
             var classUsings = GetUsingsFromClass(classDeclaration);
+            var additionalUsings = webApiUsings.Select(u => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(u)));
             var classNamespace = GetNamespaceFromClass(classDeclaration);
             var webmethods = GetWebMethodsFrom(classDeclaration);
             var constructors = GetConstructorsFrom(classDeclaration);
-            var othermembers = GetMembersFrom(classDeclaration).Except(webmethods).Except(constructors);
+            var fields = GetFieldsFrom(classDeclaration);
+            var othermembers = GetMembersFrom(classDeclaration).Except(webmethods).Except(constructors).Except(fields);
 
             //var webApiController = GenerateWebApiFrom(webmethods, othermethods);
 
@@ -75,12 +78,17 @@ namespace Asmx2WebApiFixer
             //TODO add routes based on webmethod names
 
             var newFileTree = SyntaxFactory.CompilationUnit()
-                .WithUsings(SyntaxFactory.List<UsingDirectiveSyntax>(classUsings.Select(i => (UsingDirectiveSyntax)i)))
+                .WithUsings(SyntaxFactory.List<UsingDirectiveSyntax>(classUsings.Concat(additionalUsings)))
                 .WithMembers(
                             SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
                                 SyntaxFactory.NamespaceDeclaration(
                                     SyntaxFactory.IdentifierName(classNamespace.Name.ToString()))
                                     .AddMembers(SyntaxFactory.ClassDeclaration($"{webserviceName}")
+                                        .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+                                        .WithBaseList(
+                                            SyntaxFactory.BaseList().WithTypes(SyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(
+                                                    SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseName("ApiController")))))
+                                        .AddMembers(fields.ToArray())
                                         .AddMembers(constructors.Select(c =>
                                             c.WithIdentifier(SyntaxFactory.Identifier($"{webserviceName}"))).ToArray())
                                         .AddMembers(othermembers.ToArray()))))
@@ -109,8 +117,12 @@ namespace Asmx2WebApiFixer
 
         private IList<ConstructorDeclarationSyntax> GetConstructorsFrom(ClassDeclarationSyntax webservice)
         {
-            var constructors = webservice.Members.Where(m => m is ConstructorDeclarationSyntax).Cast<ConstructorDeclarationSyntax>();
-            return constructors.ToList();
+            return webservice.Members.Where(m => m is ConstructorDeclarationSyntax).Cast<ConstructorDeclarationSyntax>().ToList();
+        }
+
+        private IList<FieldDeclarationSyntax> GetFieldsFrom(ClassDeclarationSyntax webservice)
+        {
+            return webservice.Members.Where(m => m is FieldDeclarationSyntax).Cast<FieldDeclarationSyntax>().ToList();
         }
 
         private IList<MemberDeclarationSyntax> GetMembersFrom(ClassDeclarationSyntax webservice)
