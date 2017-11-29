@@ -58,9 +58,9 @@ namespace Asmx2WebApiFixer
         {
             var webserviceName = classDeclaration.Identifier.Text;
             webserviceName = webserviceName.Replace("Service", String.Empty);
-            webserviceName = webserviceName.Replace("service", String.Empty);
-            webserviceName = $"{webserviceName}Controller";
+            var controllerName = webserviceName.Replace("service", String.Empty);
 
+            var controllerClass = GetWebApiControllerClassDeclaration(controllerName);
             var classUsings = GetUsingsFromClass(classDeclaration);
             var additionalUsings = webApiUsings.Select(u => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(u)));
             var classNamespace = GetNamespaceFromClass(classDeclaration);
@@ -68,7 +68,7 @@ namespace Asmx2WebApiFixer
             var constructors = GetConstructorsFrom(classDeclaration);
             var fields = GetFieldsFrom(classDeclaration);
             var othermembers = GetMembersFrom(classDeclaration).Except(webmethods).Except(constructors).Except(fields);
-
+            var controllerMethods = GetApiControllerMethods(false, webmethods);
             //var webApiController = GenerateWebApiFrom(webmethods, othermethods);
 
             //TODO get name of webservice
@@ -83,20 +83,51 @@ namespace Asmx2WebApiFixer
                             SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
                                 SyntaxFactory.NamespaceDeclaration(
                                     SyntaxFactory.IdentifierName(classNamespace.Name.ToString()))
-                                    .AddMembers(SyntaxFactory.ClassDeclaration($"{webserviceName}")
-                                        .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
-                                        .WithBaseList(
-                                            SyntaxFactory.BaseList().WithTypes(SyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(
-                                                    SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseName("ApiController")))))
+                                    .AddMembers(controllerClass
                                         .AddMembers(fields.ToArray())
                                         .AddMembers(constructors.Select(c =>
-                                            c.WithIdentifier(SyntaxFactory.Identifier($"{webserviceName}"))).ToArray())
+                                            c.WithIdentifier(SyntaxFactory.Identifier($"{controllerName}Controller"))).ToArray())
                                         .AddMembers(othermembers.ToArray()))))
                 .WithoutLeadingTrivia()
                 .NormalizeWhitespace();
 
-            var newDocument = document.Project.AddDocument($"{webserviceName}.cs", SourceText.From(newFileTree.ToFullString()), document.Folders);
+            var newDocument = document.Project.AddDocument($"{webserviceName}Controller.cs", SourceText.From(newFileTree.ToFullString()), document.Folders);
             return newDocument.Project.Solution;
+        }
+
+        private ClassDeclarationSyntax GetWebApiControllerClassDeclaration(string controllerName)
+        {
+            var classDeclaration = SyntaxFactory.ClassDeclaration($"{controllerName}Controller")
+                                        .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+                                        .WithBaseList(
+                                            SyntaxFactory.BaseList().WithTypes(SyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(
+                                                    SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseName("ApiController")))));
+
+            var routePrefixAttribute = SyntaxFactory.Attribute(SyntaxFactory.ParseName("RoutePrefix"))
+                .WithArgumentList(
+                    SyntaxFactory.AttributeArgumentList(
+                        SyntaxFactory.SingletonSeparatedList<AttributeArgumentSyntax>(
+                            SyntaxFactory.AttributeArgument(
+                                SyntaxFactory.LiteralExpression(
+                                    SyntaxKind.StringLiteralExpression,
+                                    SyntaxFactory.Literal($"api/{controllerName}"))))));
+
+            return classDeclaration.WithAttributeLists(
+                SyntaxFactory.SingletonList<AttributeListSyntax>(
+                    SyntaxFactory.AttributeList(
+                        SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(routePrefixAttribute))));
+        }
+
+        private IList<MethodDeclarationSyntax> GetApiControllerMethods(bool isHttpPost, IList<MethodDeclarationSyntax> webmethods)
+        {
+            //If httpPost, add httppost method
+            //If not httpPost, check on method level
+
+            //Get parameters, if none, this should be a httpget
+            //if parameters and get, add querystring parameters
+            //if parameters and post, add route parameters
+
+            return webmethods;
         }
 
         private IList<UsingDirectiveSyntax> GetUsingsFromClass(ClassDeclarationSyntax @class)
