@@ -1,0 +1,129 @@
+﻿using System;
+using moksy.core;
+using System.Diagnostics;
+
+namespace TemplateNamespace
+{
+    public class TemplateMok : IMok
+    {
+        private bool callBase;
+        private MokkedActions mokkedActions;
+        private MokkedActionsOfT<object> mokkedActionsOfT;
+        private MokkedActionsOfT<object, object> mokkedActionsOfT2;
+
+        public MokkedActions MokkedActions => mokkedActions;
+        public MokkedActionsOfT<object> MokkedActionsOfT => mokkedActionsOfT;
+        public MokkedActionsOfT<object, object> MokkedActionsOfT2 => mokkedActionsOfT2;
+
+        private void EnsureMokked()
+        {
+            if (mokkedActions == null)
+                mokkedActions = new MokkedActions();
+
+            if (mokkedActionsOfT == null)
+                mokkedActionsOfT = new MokkedActionsOfT<object>();
+
+            if (mokkedActionsOfT2 == null)
+                mokkedActionsOfT2 = new MokkedActionsOfT<object, object>();
+
+            //todo
+        }
+
+        public IMok AddMokkedStuff(string name, Action stuff)
+        {
+            EnsureMokked();
+            mokkedActions.Add(name, stuff);
+            return this;
+        }
+
+        public IMok AddMokkedStuff(string name, Action<object> stuff)
+        {
+            EnsureMokked();
+            mokkedActionsOfT.Add(name, stuff);
+            return this;
+        }
+
+        public IMok AddMokkedStuff(string name, Func<object> stuff)
+        {
+            EnsureMokked();
+            return this;
+        }
+
+        protected void ExecuteMokked(string mokkedStuffKey, object first = null, object second = null)
+        {
+            if (mokkedActions.ContainsKey(mokkedStuffKey))
+                mokkedActions[mokkedStuffKey].Invoke();
+
+            if (mokkedActionsOfT.ContainsKey(mokkedStuffKey))
+                mokkedActionsOfT[mokkedStuffKey].Invoke(first);
+
+            if (mokkedActionsOfT2.ContainsKey(mokkedStuffKey))
+                mokkedActionsOfT2[mokkedStuffKey].Invoke(first, second);
+        }
+
+        public IMok SetCallBase(bool callBase)
+        {
+            this.callBase = callBase;
+            return this;
+        }
+
+        public IMok AddMokkedStuff<T1>(string name, Action<T1> stuff)
+        {
+            EnsureMokked();
+            mokkedActionsOfT.Add(name, (i) => stuff.Invoke((T1)i));
+            return this;
+        }
+
+        public IMok AddMokkedStuff<T1, T2>(string name, Action<T1, T2> stuff)
+        {
+            EnsureMokked();
+            mokkedActionsOfT2.Add(name, (i1, i2) => stuff.Invoke((T1)i1, (T2)i2));
+            return this;
+        }
+
+        public IMok AddMokkedStuff<T1, T2, T3>(string name, Action<T1, T2, T3> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<T1, T2, T3, T4>(string name, Action<T1, T2, T3, T4> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<T1, T2, T3, T4, T5>(string name, Action<T1, T2, T3, T4, T5> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<TResult>(string name, Func<TResult> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<T1, TResult>(string name, Func<T1, TResult> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<T1, T2, TResult>(string name, Func<T1, T2, TResult> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<T1, T2, T3, TResult>(string name, Func<T1, T2, T3, TResult> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<T1, T2, T3, T4, TResult>(string name, Func<T1, T2, T3, T4, TResult> stuff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMok AddMokkedStuff<T1, T2, T3, T4, T5, TResult>(string name, Func<T1, T2, T3, T4, T5, TResult> stuff)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
