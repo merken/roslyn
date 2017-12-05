@@ -215,8 +215,7 @@ namespace moksy.roslyn
                                                                 SyntaxFactory.ArgumentList())))))
                                             .WithCloseBraceToken(
                                                 SyntaxFactory.Token(
-                                                    SyntaxFactory.TriviaList(
-                                                        SyntaxFactory.Comment("//todo")),
+                                                    SyntaxFactory.TriviaList(),
                                                     SyntaxKind.CloseBraceToken,
                                                     SyntaxFactory.TriviaList()))),
                                         SyntaxFactory.MethodDeclaration(
@@ -1122,6 +1121,7 @@ namespace moksy.roslyn
                                                             SyntaxFactory.IdentifierName("NotImplementedException"))
                                                         .WithArgumentList(
                                                             SyntaxFactory.ArgumentList())))))}))))))
+            .NormalizeWhitespace()
             .SyntaxTree;
         }
     }

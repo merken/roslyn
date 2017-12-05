@@ -42,21 +42,25 @@ namespace moksy.roslyn
         public static TypeSyntax GetTypeSyntax(this Type type)
         {
             string typeName = type.Name;
+
             if (typeName.ToLower() == "void")
-                typeName = "void";
+                return SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
 
             return SyntaxFactory.ParseTypeName(typeName);
         }
 
         public static CSharpCompilation AddCoreReference(this CSharpCompilation compilation)
         {
-            var mscorlib = typeof(object).GetTypeInfo().Assembly.Location;
-            var coreDir = Directory.GetParent(mscorlib);
+            var trustedPlatformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
 
-            return compilation.AddReferences(
-                    MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "mscorlib.dll"),
-                    MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.dll"),
-                    MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"));
+            var libraries = ((String)trustedPlatformAssemblies).Split(Path.PathSeparator);
+            foreach (var library in libraries)
+            {
+                Console.WriteLine("Adding Reference:" + library);
+                compilation = compilation.AddReferences(MetadataReference.CreateFromFile(library));
+            }
+
+            return compilation;
         }
 
         public static CSharpCompilation AddReferenceFromType(this CSharpCompilation compilation, Type type)
@@ -66,18 +70,6 @@ namespace moksy.roslyn
 
         }
 
-        // public static SyntaxTree FormatTree(this CompilationUnitSyntax compilation)
-        // {
-        //     var workspace = new AdhocWorkspace();
-        //     var options = workspace.Options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInMethods, true)
-        //                         .WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInTypes, true);
-
-        //     SyntaxNode formattedNode = Formatter.Format(compilation, workspace, options);
-        //     var formattedTree = SyntaxFactory.SyntaxTree(formattedNode, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp7));
-
-        //     return formattedTree;
-        // }
-
         public static Assembly BuildAssembly(this CSharpCompilation compilation)
         {
             //Emit to stream
@@ -85,7 +77,18 @@ namespace moksy.roslyn
             var emitResult = compilation.Emit(ms);
 
             if (!emitResult.Success)
-                throw new NotSupportedException($"Compilation did not succeed");
+            {
+                IEnumerable<Diagnostic> failures = emitResult.Diagnostics.Where(diagnostic =>
+                        diagnostic.IsWarningAsError ||
+                        diagnostic.Severity == DiagnosticSeverity.Error);
+
+                foreach (Diagnostic diagnostic in failures)
+                {
+                    Console.Error.WriteLine("{0}: {1}", diagnostic.Id, diagnostic.GetMessage());
+                }
+
+                throw new NotSupportedException($"Compilation did not succeed : {failures.Count()} errors.");
+            }
 
             return Assembly.Load(ms.ToArray());
         }

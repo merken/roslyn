@@ -36,7 +36,7 @@ namespace moksy.roslyn
             var newCompilation = SyntaxFactory.CompilationUnit()
                 .AddUsings(usings.Select(u => SyntaxFactory.UsingDirective(u.Name)).ToArray())
                 .AddMembers(@namespace
-                    .AddMembers(@class));
+                    .AddMembers(@class)).NormalizeWhitespace();
 
             // var formattedTree = newCompilation.FormatTree();
             var compilation = CreateCompilation<T>(newCompilation.SyntaxTree);
@@ -131,7 +131,7 @@ namespace moksy.roslyn
             return baseCall;
         }
 
-        private static CSharpCompilation CreateCompilation<T>(SyntaxTree formattedTree)
+        private static CSharpCompilation CreateCompilation<T>(SyntaxTree tree)
         {
             var compilationOptions = new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary);
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString() + ".dll")
@@ -139,7 +139,7 @@ namespace moksy.roslyn
                 .AddCoreReference()
                 .AddReferenceFromType(typeof(IMok))
                 .AddReferenceFromType(typeof(T))
-                .AddSyntaxTrees(CSharpSyntaxTree.ParseText(formattedTree.ToString()));
+                .AddSyntaxTrees(tree);
             return compilation;
         }
 
