@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using System.Reflection;
 
 namespace welfare.generation
 {
@@ -24,9 +25,14 @@ namespace welfare.generation
             foreach (var rule in welfareRules.OrderBy(r => r.Id))
                 welfareServiceBuilder = welfareServiceBuilder.AddWelfareRule(rule);
 
-            var compiled = welfareServiceBuilder.Build();
-            var welfareServiceInstance = compiled.GetNewInstance();
-            welfareServiceInstance.GetWelfare(0, 1, 1, 0, 999, 18);
+            var compilation = welfareServiceBuilder.CreateCompilation();
+            var welfareServiceInstance = compilation
+                .Build()
+                .GetNewInstance();
+            var welfare = welfareServiceInstance.GetWelfare(0, 1, 1, 0, 999, 18);
+            Console.WriteLine($"Welfare for this person is : {welfare}");
+
+            compilation.SaveToFile("welfarelogic.dll");
         }
 
         private static IConfigurationRoot ReadConfiguration()

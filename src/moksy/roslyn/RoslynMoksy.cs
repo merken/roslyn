@@ -41,11 +41,14 @@ namespace moksy.roslyn
             // var formattedTree = newCompilation.FormatTree();
             var compilation = CreateCompilation<T>(newCompilation.SyntaxTree);
 
-            if (!File.Exists(@"moksy.dll"))
+            if (File.Exists(@"moksy.dll"))
             {
-                var stream = new FileStream(@"moksy.dll", FileMode.CreateNew);
-                var emitResult = compilation.Emit(stream);
+                File.Delete(@"moksy.dll");
             }
+
+            var stream = new FileStream(@"moksy.dll", FileMode.CreateNew);
+            var emitResult = compilation.Emit(stream);
+            stream.Close();
 
             var mokAssembly = compilation.BuildAssembly();
             var mokkedType = mokAssembly.GetType($"{typeNamespace}.{typeName}Mok");

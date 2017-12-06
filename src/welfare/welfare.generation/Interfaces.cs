@@ -4,7 +4,8 @@ namespace welfare.generation
 {
     public interface ICompiledWelfareService{
         IWelfareService GetNewInstance();
-        void SaveToFile(string filename);
+        ICompiledWelfareService Build();
+        ICompiledWelfareService SaveToFile(string filename);
     }
 
     public interface IWelfareServiceBuilder
@@ -12,6 +13,6 @@ namespace welfare.generation
         IWelfareServiceBuilder AddNamespace(string name);
         IWelfareServiceBuilder AddUsing(string name);
         IWelfareServiceBuilder AddWelfareRule(WelfareRule rule);
-        ICompiledWelfareService Build();
+        ICompiledWelfareService CreateCompilation();
     }
 }

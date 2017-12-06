@@ -8,6 +8,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using System;
 using System.Reflection;
 using welfare.core;
+using Microsoft.Extensions.DependencyModel;
 
 namespace welfare.generation
 {
@@ -16,16 +17,17 @@ namespace welfare.generation
         private CSharpCompilation compilation;
         private Assembly assembly;
         private string namespaceType;
-        
+
         public CompiledWelfareService(CompilationUnitSyntax compilationUnit, string namespaceType)
         {
             this.namespaceType = namespaceType;
-            compilation = CSharpCompilation.Create(Guid.NewGuid().ToString() + ".dll")
-                .WithOptions(new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary))
+            compilation = CSharpCompilation.Create(Guid.NewGuid().ToString() + ".dll", new List<SyntaxTree> { compilationUnit.SyntaxTree })
+                .WithOptions(new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary)
+                    .WithAllowUnsafe(false)
+                    .WithOptimizationLevel(OptimizationLevel.Release)
+                    .WithPlatform(Platform.AnyCpu))
                 .AddCoreReference()
-                .AddReferenceFromType(typeof(IWelfareService))
-                .AddSyntaxTrees(compilationUnit.SyntaxTree);
-            assembly = compilation.BuildAssembly();
+                .AddReferenceFromType(typeof(IWelfareService));
         }
 
         public IWelfareService GetNewInstance()
@@ -34,15 +36,21 @@ namespace welfare.generation
             return (IWelfareService)Activator.CreateInstance(welfareService);
         }
 
-        public void SaveToFile(string filename)
+        public ICompiledWelfareService Build()
         {
+            assembly = compilation.BuildAssembly();
+            return this;
+        }
 
+        public ICompiledWelfareService SaveToFile(string filename)
+        {
+            assembly = compilation.BuildAssembly(filename);
+            return this;
         }
     }
 
     public class WelfareServiceBuilder : IWelfareServiceBuilder
     {
-        private CompilationUnitSyntax compilationUnit;
         private IList<UsingDirectiveSyntax> usings;
         private NamespaceDeclarationSyntax namespaceDeclarationSyntax;
         private IList<WelfareRule> welfareRules;
@@ -63,8 +71,14 @@ namespace welfare.generation
 
         public IWelfareServiceBuilder AddUsing(string name)
         {
-            var usingDirective = UsingDirective(IdentifierName(name));
-            this.usings.Add(usingDirective);
+            var directiveSymbols = name.Split(new String[] { "." }, StringSplitOptions.None).ToList();
+            NameSyntax usingDirective = IdentifierName(directiveSymbols.First());
+            foreach (var additionalSymbol in directiveSymbols.Skip(1))
+            {
+                usingDirective = QualifiedName(usingDirective, IdentifierName(additionalSymbol));
+            }
+
+            this.usings.Add(UsingDirective(usingDirective));
             return this;
         }
 
@@ -74,7 +88,7 @@ namespace welfare.generation
             return this;
         }
 
-        public ICompiledWelfareService Build()
+        public ICompiledWelfareService CreateCompilation()
         {
             var compilationUnit = CompilationUnit()
                 .WithUsings(List<UsingDirectiveSyntax>(usings.ToArray()));

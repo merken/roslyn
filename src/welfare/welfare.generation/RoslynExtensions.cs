@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Extensions.DependencyModel;
 
 namespace welfare.generation
 {
@@ -27,16 +28,21 @@ namespace welfare.generation
         public static CSharpCompilation AddReferenceFromType(this CSharpCompilation compilation, Type type)
         {
             var assembly = type.GetTypeInfo().Assembly.Location;
-            
+
             Console.WriteLine("Adding Reference:" + assembly);
-            return compilation.AddReferences(MetadataReference.CreateFromFile(assembly));
+            return compilation.AddReferences(MetadataReference.CreateFromFile(assembly, MetadataReferenceProperties.Assembly));
         }
 
-        public static Assembly BuildAssembly(this CSharpCompilation compilation)
+        public static Assembly BuildAssembly(this CSharpCompilation compilation, string filename = null)
         {
+            Console.WriteLine("Compilation starting for tree");
+            Console.Error.WriteLine(compilation.SyntaxTrees[0].ToString());
+
             //Emit to stream
-            var ms = new MemoryStream();
-            var emitResult = compilation.Emit(ms);
+            Stream stream = new MemoryStream();
+            if (filename != null)
+                stream = File.Create(filename);
+            var emitResult = compilation.Emit(stream);
 
             if (!emitResult.Success)
             {
@@ -49,12 +55,19 @@ namespace welfare.generation
                     Console.Error.WriteLine("{0}: {1}", diagnostic.Id, diagnostic.GetMessage());
                 }
 
-                Console.Error.WriteLine(compilation.SyntaxTrees[0].ToString());
 
                 throw new NotSupportedException($"Compilation did not succeed : {failures.Count()} errors.");
             }
             Console.WriteLine("Compilation succeeded");
-            return Assembly.Load(ms.ToArray());
+            
+            if (filename != null)
+            {
+                filename = (stream as FileStream).Name;
+                stream.Close();
+                return Assembly.LoadFile(filename);
+            }
+
+            return Assembly.Load((stream as MemoryStream).ToArray());
         }
     }
 }
