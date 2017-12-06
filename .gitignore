@@ -3,3 +3,4 @@ obj/
 dist/
 packages/
 tools/
+test-results/
