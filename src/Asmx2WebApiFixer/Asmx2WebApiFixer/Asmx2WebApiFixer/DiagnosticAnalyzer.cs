@@ -40,7 +40,7 @@ namespace Asmx2WebApiFixer
                 classDeclaration.AttributeLists.ContainsAttributeInList("WebService"))
             {
                 //This is a script service
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), classDeclaration.Identifier.Text));
             }
             return;
         }
