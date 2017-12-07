@@ -1,6 +1,6 @@
 USE [Unemployment]
 GO
-/****** Object:  Table [dbo].[HandicapType]    Script Date: 7/12/2017 10:08:48 ******/
+/****** Object:  Table [dbo].[HandicapType]    Script Date: 7/12/2017 10:19:00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -14,7 +14,7 @@ CREATE TABLE [dbo].[HandicapType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[MaritalStatus]    Script Date: 7/12/2017 10:08:48 ******/
+/****** Object:  Table [dbo].[MaritalStatus]    Script Date: 7/12/2017 10:19:00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -28,7 +28,7 @@ CREATE TABLE [dbo].[MaritalStatus](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[WelfareLogic]    Script Date: 7/12/2017 10:08:48 ******/
+/****** Object:  Table [dbo].[WelfareLogic]    Script Date: 7/12/2017 10:19:00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -49,7 +49,7 @@ CREATE TABLE [dbo].[WelfareLogic](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[WelfareScript]    Script Date: 7/12/2017 10:08:48 ******/
+/****** Object:  Table [dbo].[WelfareScript]    Script Date: 7/12/2017 10:19:00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -94,25 +94,27 @@ SET IDENTITY_INSERT [dbo].[WelfareLogic] ON
 GO
 INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (1, 0, 1, 1, 0, 0, 1000, 18, CAST(953.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (2, 0, 1, 1, 0, 1000, 2000, 18, CAST(1300.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (2, 4, 1, 1, 0, 0, 1000, 18, CAST(953.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (3, 4, 1, 1, 0, 1000, 2000, 18, CAST(1200.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (3, 12, 1, 1, 0, 0, 1000, 18, CAST(953.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (4, 12, 1, 1, 0, 1000, 2000, 18, CAST(1100.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (4, 0, 1, 1, 0, 1000, 2000, 18, CAST(1300.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (5, 0, 2, 1, 0, 0, 1000, 18, CAST(715.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (5, 4, 1, 1, 0, 1000, 2000, 18, CAST(1200.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (6, 0, 2, 1, 0, 1000, 2000, 18, CAST(1300.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (6, 12, 1, 1, 0, 1000, 2000, 18, CAST(1100.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (7, 4, 2, 1, 0, 1000, 2000, 18, CAST(1200.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (7, 0, 2, 1, 0, 0, 1000, 18, CAST(715.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (8, 12, 2, 1, 0, 1000, 2000, 18, CAST(800.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (8, 0, 2, 1, 0, 1000, 2000, 18, CAST(1300.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (9, 0, 3, 1, 1, 0, 1000, 18, CAST(1135.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (9, 4, 2, 1, 0, 1000, 2000, 18, CAST(1200.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (10, 0, 3, 1, 1, 1000, 2000, 18, CAST(1300.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (10, 12, 2, 1, 0, 1000, 2000, 18, CAST(800.00 AS Decimal(18, 2)))
 GO
-INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (11, 4, 3, 1, 1, 1000, 2000, 18, CAST(1200.00 AS Decimal(18, 2)))
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (11, 0, 3, 1, 1, 0, 1000, 18, CAST(1135.00 AS Decimal(18, 2)))
+GO
+INSERT [dbo].[WelfareLogic] ([Id], [Month], [IdMaritalStatus], [idHandicap], [NumberOfChildren], [BrutoStart], [BrutoEnd], [Age], [Value]) VALUES (12, 0, 3, 1, 1, 1000, 2000, 18, CAST(1300.00 AS Decimal(18, 2)))
 GO
 SET IDENTITY_INSERT [dbo].[WelfareLogic] OFF
 GO
