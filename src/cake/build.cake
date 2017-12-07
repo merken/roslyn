@@ -23,7 +23,6 @@ Task("Clean")
     CleanDirectory("./test/bin");
 });
 
-
 Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
@@ -49,7 +48,6 @@ Task("Build")
     DotNetCoreBuild(testProject, settings);
 });
 
-
 Task("Run_Console")
     .IsDependentOn("Build")
     .Does(() =>
@@ -68,7 +66,6 @@ Task("Test")
     // MA - Transform the result XML into NUnit-compatible XML for the build server.
     XmlTransform("./xunit2nunit.xsl", "./test/test-results/xunit-results.xml", "./test/test-results/nunit-results.xml");
 });
-
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
