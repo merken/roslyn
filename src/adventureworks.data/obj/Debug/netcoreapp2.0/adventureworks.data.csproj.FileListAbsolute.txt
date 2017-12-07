@@ -1,8 +1,0 @@
-C:\src\roslyn\src\adventureworks.data\bin\Debug\netcoreapp2.0\adventureworks.data.deps.json
-C:\src\roslyn\src\adventureworks.data\bin\Debug\netcoreapp2.0\adventureworks.data.dll
-C:\src\roslyn\src\adventureworks.data\bin\Debug\netcoreapp2.0\adventureworks.data.pdb
-C:\src\roslyn\src\adventureworks.data\obj\Debug\netcoreapp2.0\adventureworks.data.csproj.CoreCompileInputs.cache
-C:\src\roslyn\src\adventureworks.data\obj\Debug\netcoreapp2.0\adventureworks.data.AssemblyInfoInputs.cache
-C:\src\roslyn\src\adventureworks.data\obj\Debug\netcoreapp2.0\adventureworks.data.AssemblyInfo.cs
-C:\src\roslyn\src\adventureworks.data\obj\Debug\netcoreapp2.0\adventureworks.data.dll
-C:\src\roslyn\src\adventureworks.data\obj\Debug\netcoreapp2.0\adventureworks.data.pdb
