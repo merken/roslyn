@@ -24,6 +24,7 @@ namespace tests
             mokked.MokSomething<int, string, MokMe>(m => m.DoStuff(MokParams.Any<int>(), MokParams.Any<string>()), (i, a) =>
                 Debug.WriteLine("I AM MOKKED " + i + a));
 
+            mokked.DoStuff();
             mokked.DoStuff(100);
             mokked.DoStuff(42, "IS THIS REAL ?");
 
