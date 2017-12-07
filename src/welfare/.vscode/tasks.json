@@ -2,12 +2,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "build",
+            "taskName": "buildGeneration",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
                 "${workspaceFolder}/welfare.generation/welfare.generation.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "buildScripting",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/welfare.scripting/welfare.scripting.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

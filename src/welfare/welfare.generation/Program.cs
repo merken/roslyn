@@ -26,13 +26,39 @@ namespace welfare.generation
                 welfareServiceBuilder = welfareServiceBuilder.AddWelfareRule(rule);
 
             var compilation = welfareServiceBuilder.CreateCompilation();
-            var welfareServiceInstance = compilation
-                .Build()
-                .GetNewInstance();
-            var welfare = welfareServiceInstance.GetWelfare(0, 1, 1, 0, 999, 18);
-            Console.WriteLine($"Welfare for this person is : {welfare}");
 
             compilation.SaveToFile("welfarelogic.dll");
+
+            var welfareService = compilation
+                .Build()
+                .GetNewInstance();
+
+            Console.WriteLine($"Welfare for 0 months, unmarried, no handicap, no kids, wage:500, age:19");
+            Console.WriteLine($"{welfareService.GetWelfare(0, 1, 1, 0, 500, 19)}");
+            Console.WriteLine($"");
+
+            Console.WriteLine($"Welfare for 4 months, unmarried, no handicap, no kids, wage:500, age:19");
+            Console.WriteLine($"{welfareService.GetWelfare(4, 1, 1, 0, 500, 19)}");
+            Console.WriteLine($"");
+
+            Console.WriteLine($"Welfare for 12 months, unmarried, no handicap, no kids, wage:500, age:19");
+            Console.WriteLine($"{welfareService.GetWelfare(12, 1, 1, 0, 500, 19)}");
+            Console.WriteLine($"");
+
+            Console.WriteLine($"Welfare for 0 months, unmarried, no handicap, no kids, wage:1600, age:19");
+            Console.WriteLine($"{welfareService.GetWelfare(0, 1, 1, 0, 1600, 19)}");
+            Console.WriteLine($"");
+
+            Console.WriteLine($"Welfare for 4 months, unmarried, no handicap, no kids, wage:1600, age:19");
+            Console.WriteLine($"{welfareService.GetWelfare(4, 1, 1, 0, 1600, 19)}");
+            Console.WriteLine($"");
+
+            Console.WriteLine($"Welfare for 12 months, unmarried, no handicap, no kids, wage:1600, age:19");
+            Console.WriteLine($"{welfareService.GetWelfare(12, 1, 1, 0, 1600, 19)}");
+            Console.WriteLine($"");
+
+            Console.WriteLine($"Terminated");
+            Console.Read();
         }
 
         private static IConfigurationRoot ReadConfiguration()
