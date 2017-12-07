@@ -1,22 +1,20 @@
-# roslyn
-First build the mssql server linux adventureworks image.
+# roslyn code samples
+
+Welfare
+=======
+
+To run the welfare projects, first build the mssql server linux unemloyment docker image.
 
 ```
-cd src/adventureworks16
-docker build . -t=adventureworks16
+cd src/welfare/docker
+docker build . -t=unemployment
 ```
-Then, run the image including the 
+Then, run the image 
 ```
-docker run -p 1433:1433 -d adventureworks16
+docker run -p 1433:1433 -d unemployment
 ```
-Connect SSMS to localhost with SA and restore backup.
+Connect SSMS to 127.0.0.1 with SA (password: abc123$%).
 
-Scaffold the ef model.
-```
-dotnet ef dbcontext scaffold -c Adventureworks -o model "Data Source=127.0.0.1;Initial Catalog=AdventureWorks2016;persist security info=True;user id=sa;password=abc123$%" Microsoft.EntityFrameworkCore.SqlServer --force
+Run the db creation script src/welfare/welfare.sql/createdb.sql
 
-dotnet ef dbcontext scaffold -c AdventureworksLogic -o logic "Data Source=127.0.0.1;Initial Catalog=AdventureWorks.Logic;persist security info=True;user id=sa;password=abc123$%" Microsoft.EntityFrameworkCore.SqlServer --force
-```
-
-https://docs.microsoft.com/en-us/aspnet/core/mvc/razor-pages/?tabs=visual-studio
-https://msdn.microsoft.com/en-us/magazine/mt842512.aspx
+Run the schema creation script src/welfare/welfare.sql/createschema.sql
